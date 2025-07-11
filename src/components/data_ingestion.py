@@ -6,6 +6,8 @@ from src.exception import CustomException
 from src.logger import logging
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
+from src.components.data_transformation import DataTransformation
+from src.components.model_trainer import Modelling
 
 @dataclass
 class DataConfig:
@@ -46,4 +48,12 @@ class DataIngestion:
 if __name__=="__main__":
     obj = DataIngestion()
     train_data,test_data =  obj.initiate_ingestion()
+
+obj1=DataTransformation()
+train_array,test_array, _ = obj1.transformation()
+
+
+
+obj2 = Modelling()
+best_model, best_acc, model_path = obj2.ModelTrainer(train_array, test_array)
 

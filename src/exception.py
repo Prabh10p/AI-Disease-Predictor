@@ -8,7 +8,6 @@ def error_handler(error, error_details: sys):
     )
     return error_message
 
-# ✅ This must be a class
 class CustomException(Exception):
     def __init__(self, error_message, error_details: sys):
         super().__init__(error_message)
@@ -17,7 +16,6 @@ class CustomException(Exception):
     def __str__(self):
         return self.error_message
 
-# ✅ Test block
 if __name__ == "__main__":
     try:
         a = 1 / 0
