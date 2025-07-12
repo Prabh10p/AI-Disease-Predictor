@@ -49,9 +49,8 @@ if __name__=="__main__":
     obj = DataIngestion()
     train_data,test_data =  obj.initiate_ingestion()
 
-obj1=DataTransformation()
-train_array,test_array, _ = obj1.transformation()
-
+transformation = DataTransformation()
+train_array, test_array, preprocessor_path, encoder_path = transformation.transformation()
 
 
 obj2 = Modelling()

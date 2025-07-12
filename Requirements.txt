@@ -1,6 +1,7 @@
 pandas
 numpy
 dill
+flask
 scikit-learn
 xgboost
 catboost

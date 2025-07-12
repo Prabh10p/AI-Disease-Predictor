@@ -13,6 +13,7 @@ from src.utils import save_object
 @dataclass
 class TransformationConfig:
     preprocessor_path: str = os.path.join("Artifacts", "preprocessor.pkl")
+    encoder_path: str = os.path.join("Artifacts", "label_encoder.pkl") 
 
 
 from sklearn.compose import ColumnTransformer
@@ -44,6 +45,11 @@ class DataTransformation:
             encoder = LabelEncoder()
             y_train_encoded = encoder.fit_transform(y_train)
             y_test_encoded = encoder.transform(y_test)
+
+
+
+            save_object(self.config.encoder_path, encoder)
+            logging.info("Label encoder saved successfully")
 
             # -------------------------
             # Get columns
@@ -83,7 +89,7 @@ class DataTransformation:
             train_array = np.c_[X_train_processed.toarray() if hasattr(X_train_processed, 'toarray') else X_train_processed, y_train_encoded]
             test_array = np.c_[X_test_processed.toarray() if hasattr(X_test_processed, 'toarray') else X_test_processed, y_test_encoded]
 
-            return (train_array, test_array, self.config.preprocessor_path)
+            return (train_array, test_array, self.config.preprocessor_path, self.config.encoder_path)
 
         except Exception as e:
             raise CustomException(e, sys)

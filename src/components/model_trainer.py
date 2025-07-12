@@ -36,8 +36,8 @@ class Modelling:
 
 
             models = {
-                #"AdaBoost": AdaBoostClassifier(),
-                #"GradientBoost": GradientBoostingClassifier(),
+                "AdaBoost": AdaBoostClassifier(),
+                "GradientBoost": GradientBoostingClassifier(),
                 "RandomForest": RandomForestClassifier(),
                 "Logistic": LogisticRegression(),
                 "CatBoost": CatBoostClassifier(verbose=0),
@@ -46,15 +46,15 @@ class Modelling:
             }
 
             params = {
-                #"AdaBoost": {
-                   # "n_estimators": [10, 50, 100],
-                   # "learning_rate": [0.01, 0.1, 1.0]
-                #},
-                #"GradientBoost": {
-                   # "n_estimators": [50, 100],
-                   # "learning_rate": [0.05, 0.1],
-                   # "max_depth": [3, 5]
-                #},
+                "AdaBoost": {
+                   "n_estimators": [10, 50, 100],
+                   "learning_rate": [0.01, 0.1, 1.0]
+                },
+                "GradientBoost": {
+                   "n_estimators": [50, 100],
+                   "learning_rate": [0.05, 0.1],
+                    "max_depth": [3, 5]
+                },
                 "RandomForest": {
                     "n_estimators": [50, 100],
                     "max_depth": [None, 10],
