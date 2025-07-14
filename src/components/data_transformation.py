@@ -30,6 +30,8 @@ class DataTransformation:
             logging.info("Loading train and test data...")
             train_data = pd.read_csv("Artifacts/train.csv")
             test_data = pd.read_csv("Artifacts/test.csv")
+            train_data = train_data.loc[:, ~train_data.columns.str.contains("^Unnamed")]
+            test_data = test_data.loc[:, ~test_data.columns.str.contains("^Unnamed")]
 
             X_train = train_data.iloc[:, :-1]
             y_train = train_data.iloc[:, -1]

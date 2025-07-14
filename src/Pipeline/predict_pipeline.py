@@ -6,44 +6,38 @@ from src.logger import logging
 from src.utils import load_object
 
 
-class Pipeline:
+import pandas as pd
+import numpy as np
+import dill
+import os
+import sys
+from src.utils import load_object
+from src.exception import CustomException
+
+def clean_columns(df):
+    # Strips whitespace, replaces spaces with _, and removes special characters
+    df.columns = df.columns.str.strip().str.replace(' ', '_').str.replace(r'[^\w_]', '', regex=True)
+    return df
+
+class PredictPipeline:
     def __init__(self):
-        pass
+        self.model_path = os.path.join("Artifacts", "model.pkl")
+        self.preprocessor_path = os.path.join("Artifacts", "preprocessor.pkl")
 
-    def MakePipeline(self, features: pd.DataFrame):
+    def predict(self, input_data: pd.DataFrame) -> np.ndarray:
         try:
-            logging.info("🚀 Starting prediction pipeline...")
+            # ✅ Step 1: Clean column names
+            input_data = clean_columns(input_data)
 
-            model_path = os.path.join("Artifacts", "model.pkl")
-            prep_path = os.path.join("Artifacts", "preprocessor.pkl")
-            encoder_path = os.path.join("Artifacts", "label_encoder.pkl")
+            # ✅ Step 2: Load preprocessor and model
+            model = load_object(self.model_path)
+            preprocessor = load_object(self.preprocessor_path)
 
-            model = load_object(model_path)
-            preprocessor = load_object(prep_path)
-            encoder = load_object(encoder_path)
+            # ✅ Step 3: Transform and predict
+            transformed_data = preprocessor.transform(input_data)
+            preds = model.predict(transformed_data)
 
-            logging.info("✅ Model, preprocessor, and encoder loaded successfully")
-
-            # Drop target if accidentally included
-            if "prognosis" in features.columns:
-                features = features.drop(columns=["prognosis"])
-
-            # Ensure feature names match preprocessor
-            expected_cols = preprocessor.feature_names_in_
-            missing_cols = set(expected_cols) - set(features.columns)
-            if missing_cols:
-                raise CustomException(
-                    f"❌ Columns are missing: {missing_cols}", sys
-                )
-
-            # Reorder columns
-            features = features[expected_cols]
-
-            data_scaled = preprocessor.transform(features)
-            y_pred_encoded = model.predict(data_scaled)
-            y_pred_decoded = encoder.inverse_transform(y_pred_encoded)
-
-            return y_pred_decoded
+            return preds
 
         except Exception as e:
             raise CustomException(e, sys)
@@ -97,7 +91,12 @@ class Modelfeatures:
             'muscle_wasting': muscle_wasting,
             'vomiting': vomiting,
             'burning_micturition': burning_micturition,
+            'spotting_ urination': spotting_urination,  # space added
             'spotting_urination': spotting_urination,
+            'foul_smell_of_urine': foul_smell_of_urine,
+            'dischromic_patches': dischromic_patches,
+            'fluid_overload.1': fluid_overload_1,
+            'toxic_look_(typhos)': toxic_look_typhos,
             'fatigue': fatigue,
             'weight_gain': weight_gain,
             'anxiety': anxiety,
@@ -174,11 +173,11 @@ class Modelfeatures:
             'weakness_of_one_body_side': weakness_of_one_body_side,
             'loss_of_smell': loss_of_smell,
             'bladder_discomfort': bladder_discomfort,
-            'foul_smell_of_urine': foul_smell_of_urine,
+            'foul_smell_of urine': foul_smell_of_urine,  # space added
             'continuous_feel_of_urine': continuous_feel_of_urine,
             'passage_of_gases': passage_of_gases,
             'internal_itching': internal_itching,
-            'toxic_look_typhos': toxic_look_typhos,
+            'toxic_look_(typhos)': toxic_look_typhos,  # parentheses and underscore restored
             'depression': depression,
             'irritability': irritability,
             'muscle_pain': muscle_pain,
@@ -186,7 +185,7 @@ class Modelfeatures:
             'red_spots_over_body': red_spots_over_body,
             'belly_pain': belly_pain,
             'abnormal_menstruation': abnormal_menstruation,
-            'dischromic_patches': dischromic_patches,
+            'dischromic _patches': dischromic_patches,  # space added
             'watering_from_eyes': watering_from_eyes,
             'increased_appetite': increased_appetite,
             'polyuria': polyuria,
@@ -201,7 +200,7 @@ class Modelfeatures:
             'stomach_bleeding': stomach_bleeding,
             'distention_of_abdomen': distention_of_abdomen,
             'history_of_alcohol_consumption': history_of_alcohol_consumption,
-            'fluid_overload_1': fluid_overload_1,
+            'fluid_overload.1': fluid_overload_1,  # dot restored
             'blood_in_sputum': blood_in_sputum,
             'prominent_veins_on_calf': prominent_veins_on_calf,
             'palpitations': palpitations,
@@ -218,5 +217,5 @@ class Modelfeatures:
             'yellow_crust_ooze': yellow_crust_ooze
         }
 
-    def DataFrame(self):
+    def to_dataframe(self):
         return pd.DataFrame([self.data])
