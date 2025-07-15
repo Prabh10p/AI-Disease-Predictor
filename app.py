@@ -51,42 +51,52 @@ if os.path.exists(encoder_path):
     with open(encoder_path, 'rb') as file:
         label_encoder = pickle.load(file)
 
-@app.route('/predict', methods=["GET", "POST"])
+@app.route('/')
+def home():
+    return render_template("index.html")
+
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
     if request.method == "GET":
         return render_template("form.html", symptoms=SYMPTOM_FEATURES)
 
     if request.method == "POST":
         try:
-            # ✅ Convert form input safely to int
+            # Convert form input into binary vector
             user_inputs = {
                 feature: int(float(request.form.get(feature, 0)))
                 for feature in SYMPTOM_FEATURES
             }
 
-            input_df = pd.DataFrame([user_inputs])
-            input_df = input_df.astype(int)  # ✅ Ensure correct type
+            # Count how many symptoms are selected
+            num_selected = sum(user_inputs.values())
 
-            # ✅ Predict using your pipelines
+            if num_selected < 3:
+                return render_template(
+                    "result.html",
+                    prediction="❗ Please select at least 3 symptoms to get a reliable prediction."
+                )
+
+            input_df = pd.DataFrame([user_inputs]).astype(int)
+
             predictor = PredictPipeline()
             prediction = predictor.predict(input_df)
 
-            # ✅ Clean prediction: Convert float to int
             predicted_label = int(prediction[0].item())
 
-
-            # ✅ Decode label (disease name)
             if label_encoder:
                 final_result = label_encoder.inverse_transform([predicted_label])[0]
             else:
                 final_result = predicted_label
 
-            return render_template("result.html", symptoms=SYMPTOM_FEATURES, prediction=final_result)
+            return render_template("result.html", prediction=final_result)
 
         except Exception as e:
             return f"❌ Prediction Failed: {e}"
 
 
 
+
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=6000, debug=True)

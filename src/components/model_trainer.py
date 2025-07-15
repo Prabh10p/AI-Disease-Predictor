@@ -13,6 +13,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from src.utils import save_object,evaluate_model
 from dataclasses import dataclass
+from sklearn.multiclass import OneVsRestClassifier
 
 
 @dataclass
@@ -34,50 +35,56 @@ class Modelling:
 
             logging.info("Model training started")
 
+           
+
+
 
             models = {
-                "AdaBoost": AdaBoostClassifier(),
-                "GradientBoost": GradientBoostingClassifier(),
-                "RandomForest": RandomForestClassifier(),
-                "Logistic": LogisticRegression(),
-                "CatBoost": CatBoostClassifier(verbose=0),
-                "DecisionTree": DecisionTreeClassifier(),
-                "SVC": SVC(probability=True)
-            }
+    "AdaBoost": OneVsRestClassifier(AdaBoostClassifier()),
+    #"GradientBoost": OneVsRestClassifier(GradientBoostingClassifier()),
+    #"RandomForest": OneVsRestClassifier(RandomForestClassifier(class_weight="balanced")),
+    "Logistic": OneVsRestClassifier(LogisticRegression(class_weight="balanced", max_iter=1000)),
+    #"CatBoost": OneVsRestClassifier(CatBoostClassifier(verbose=0, class_weights='Balanced')),
+    #"DecisionTree": OneVsRestClassifier(DecisionTreeClassifier(class_weight="balanced")),
+    #"SVC": OneVsRestClassifier(SVC(probability=True, class_weight="balanced"))
+}
+
+
+            
 
             params = {
-                "AdaBoost": {
-                   "n_estimators": [10, 50, 100],
-                   "learning_rate": [0.01, 0.1, 1.0]
-                },
-                "GradientBoost": {
-                   "n_estimators": [50, 100],
-                   "learning_rate": [0.05, 0.1],
-                    "max_depth": [3, 5]
-                },
-                "RandomForest": {
-                    "n_estimators": [50, 100],
-                    "max_depth": [None, 10],
-                    "max_features": ["auto", "sqrt"]
-                },
-                "Logistic": {
-                    "C": [0.01, 0.1, 1.0, 10],
-                    "solver": ['lbfgs', 'liblinear']
-                },
-                "CatBoost": {
-                    "depth": [4, 6],
-                    "learning_rate": [0.03, 0.1],
-                    "iterations": [100, 200]
-                },
-                "DecisionTree": {
-                    "max_depth": [None, 10, 20],
-                    "criterion": ["gini", "entropy"]
-                },
-                "SVC": {
-                    "C": [0.1, 1, 10],
-                    "kernel": ["linear", "rbf"]
-                }
-            }
+    "AdaBoost": {
+        "estimator__n_estimators": [10, 50, 100],
+        "estimator__learning_rate": [0.01, 0.1, 1.0]
+    },
+    "GradientBoost": {
+        "estimator__n_estimators": [50, 100],
+        "estimator__learning_rate": [0.05, 0.1],
+        "estimator__max_depth": [3, 5]
+    },
+    "RandomForest": {
+        "estimator__n_estimators": [50, 100],
+        "estimator__max_depth": [None, 10],
+        "estimator__max_features": ["sqrt"]
+    },
+    "Logistic": {
+        "estimator__C": [0.01, 0.1, 1.0, 10],
+        "estimator__solver": ['lbfgs', 'liblinear']
+    },
+    "CatBoost": {
+        "estimator__depth": [4, 6],
+        "estimator__learning_rate": [0.03, 0.1],
+        "estimator__iterations": [100, 200]
+    },
+    "DecisionTree": {
+        "estimator__max_depth": [None, 10, 20],
+        "estimator__criterion": ["gini", "entropy"]
+    },
+    "SVC": {
+        "estimator__C": [0.1, 1, 10],
+        "estimator__kernel": ["linear", "rbf"]
+    }
+}
 
 
             logging.info("model training done")
