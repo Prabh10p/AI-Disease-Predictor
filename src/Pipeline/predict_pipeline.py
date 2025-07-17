@@ -26,14 +26,14 @@ class PredictPipeline:
 
     def predict(self, input_data: pd.DataFrame) -> np.ndarray:
         try:
-            # ✅ Step 1: Clean column names
+            # Step 1: Clean column names
             input_data = clean_columns(input_data)
 
-            # ✅ Step 2: Load preprocessor and model
+            # Step 2: Load preprocessor and model
             model = load_object(self.model_path)
             preprocessor = load_object(self.preprocessor_path)
 
-            # ✅ Step 3: Transform and predict
+            # Step 3: Transform and predict
             transformed_data = preprocessor.transform(input_data)
             preds = model.predict(transformed_data)
 
